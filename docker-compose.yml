@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: brazvia-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: brazvia
+      POSTGRES_PASSWORD: brazvia
+      POSTGRES_DB: brazvia
+    ports:
+      - '5434:5432'
+    volumes:
+      - brazvia_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U brazvia -d brazvia']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  brazvia_pg_data:

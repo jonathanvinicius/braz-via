@@ -1,0 +1,17 @@
+version = 0.1
+
+[production.deploy.parameters]
+stack_name = "brazvia-api"
+resolve_s3 = true
+s3_prefix = "brazvia-api"
+region = "sa-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Stage=\"production\" CreateManagedDatabase=\"true\" RunDbSeed=\"true\""
+
+[production.build.parameters]
+cached = true
+parallel = true
+
+[production.local_start_api.parameters]
+warm_containers = "EAGER"

@@ -1,0 +1,5 @@
+export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
+export const PROPERTY_REPOSITORY = Symbol('PROPERTY_REPOSITORY');
+export const COGNITO_SERVICE = Symbol('COGNITO_SERVICE');
+export const AUTH_SERVICE = Symbol('AUTH_SERVICE');
+export const WATERMARK_SERVICE = Symbol('WATERMARK_SERVICE');
