@@ -7,10 +7,10 @@ import type {
   WatermarkedImage,
 } from '@/domain/services/IWatermarkService';
 
-const CENTER_LOGO_RATIO = 0.48;
-const CENTER_LOGO_OPACITY = 0.22;
-const CORNER_LOGO_RATIO = 0.18;
-const CORNER_LOGO_OPACITY = 0.82;
+const CENTER_LOGO_RATIO = 0.4;
+const CENTER_LOGO_OPACITY = 0.16;
+const CORNER_LOGO_RATIO = 0.2;
+const CORNER_LOGO_OPACITY = 0.92;
 const EDGE_PADDING_RATIO = 0.035;
 
 @Injectable()
@@ -27,13 +27,13 @@ export class SharpWatermarkService implements IWatermarkService {
     );
 
     const centerLogo = await this.buildLogoOverlay({
-      targetWidth: Math.max(160, Math.round(width * CENTER_LOGO_RATIO)),
+      targetWidth: Math.max(120, Math.round(shortSide * CENTER_LOGO_RATIO)),
       opacity: CENTER_LOGO_OPACITY,
       padding: 0,
     });
 
     const cornerLogo = await this.buildLogoOverlay({
-      targetWidth: Math.max(72, Math.round(width * CORNER_LOGO_RATIO)),
+      targetWidth: Math.max(88, Math.round(width * CORNER_LOGO_RATIO)),
       opacity: CORNER_LOGO_OPACITY,
       padding,
     });
@@ -64,8 +64,10 @@ export class SharpWatermarkService implements IWatermarkService {
       .toBuffer({ resolveWithObject: true });
 
     const pixels = resized.data;
-    for (let index = 3; index < pixels.length; index += 4) {
-      pixels[index] = Math.round(pixels[index] * options.opacity);
+    for (let index = 0; index < pixels.length; index += 4) {
+      const alpha = pixels[index + 3];
+      if (alpha === 0) continue;
+      pixels[index + 3] = Math.round(alpha * options.opacity);
     }
 
     let pipeline = sharp(pixels, { raw: resized.info }).png();

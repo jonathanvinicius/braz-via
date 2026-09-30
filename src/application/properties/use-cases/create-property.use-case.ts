@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ensureUniqueSlug } from '@/application/properties/ensure-unique-slug';
+import { PropertyListCache } from '@/infrastructure/cache/property-list-cache.service';
 import { PROPERTY_REPOSITORY } from '@/common/constants/injection-tokens';
 import { toPropertyResponse } from '@/common/mappers/property-response.mapper';
 import type { IPropertyRepository } from '@/domain/repositories/IPropertyRepository';
@@ -34,6 +35,7 @@ export class CreatePropertyUseCase {
   constructor(
     @Inject(PROPERTY_REPOSITORY)
     private readonly properties: IPropertyRepository,
+    private readonly propertyListCache: PropertyListCache,
   ) {}
 
   async execute(command: CreatePropertyCommand) {
@@ -73,6 +75,7 @@ export class CreatePropertyUseCase {
       createdBy: command.createdBy ?? null,
     });
 
+    await this.propertyListCache.invalidate();
     return toPropertyResponse(created);
   }
 }

@@ -5,9 +5,11 @@ import appConfig from '@/config/app.config';
 import databaseConfig from '@/config/database.config';
 import cognitoConfig from '@/config/cognito.config';
 import s3Config from '@/config/s3.config';
+import valkeyConfig from '@/config/valkey.config';
 import { DatabaseModule } from '@/infrastructure/database/database.module';
 import { CognitoModule } from '@/infrastructure/cognito/cognito.module';
 import { StorageModule } from '@/infrastructure/storage/storage.module';
+import { CacheModule } from '@/infrastructure/cache/cache.module';
 import { WatermarkModule } from '@/infrastructure/watermark/watermark.module';
 import { RepositoriesModule } from '@/infrastructure/repositories/repositories.module';
 import { AuthGuard } from '@/common/guards/auth.guard';
@@ -21,12 +23,13 @@ import { AuthModule } from '@/modules/auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, cognitoConfig, s3Config],
+      load: [appConfig, databaseConfig, cognitoConfig, s3Config, valkeyConfig],
     }),
     DatabaseModule,
     RepositoriesModule,
     CognitoModule,
     StorageModule,
+    CacheModule,
     WatermarkModule,
     HealthModule,
     PropertiesModule,

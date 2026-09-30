@@ -1,5 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ensureUniqueSlug } from '@/application/properties/ensure-unique-slug';
+import { PropertyListCache } from '@/infrastructure/cache/property-list-cache.service';
 import { PROPERTY_REPOSITORY } from '@/common/constants/injection-tokens';
 import { toPropertyResponse } from '@/common/mappers/property-response.mapper';
 import type { IPropertyRepository } from '@/domain/repositories/IPropertyRepository';
@@ -12,6 +13,7 @@ export class UpdatePropertyUseCase {
   constructor(
     @Inject(PROPERTY_REPOSITORY)
     private readonly properties: IPropertyRepository,
+    private readonly propertyListCache: PropertyListCache,
   ) {}
 
   async execute(id: string, command: UpdatePropertyCommand) {
@@ -69,6 +71,7 @@ export class UpdatePropertyUseCase {
     if (!updated) {
       throw new NotFoundException('Imóvel não encontrado');
     }
+    await this.propertyListCache.invalidate();
     return toPropertyResponse(updated);
   }
 }
