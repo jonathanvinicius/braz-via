@@ -582,18 +582,22 @@ Resources:
         - !Ref BrazviaPrivateSubnet1
         - !Ref BrazviaPrivateSubnet2
 
-  BrazviaCacheCluster:
-    Type: AWS::ElastiCache::CacheCluster
+  BrazviaReplicationGroup:
+    Type: AWS::ElastiCache::ReplicationGroup
     Condition: CreateManagedDatabase
     Properties:
-      ClusterName: !Sub brazvia-valkey-${Stage}
+      ReplicationGroupId: !Sub brazvia-valkey-${Stage}
+      ReplicationGroupDescription: Cache Valkey Brazvia
       Engine: valkey
       EngineVersion: "8.0"
       CacheNodeType: cache.t4g.micro
-      NumCacheNodes: 1
+      NumCacheClusters: 1
+      AutomaticFailoverEnabled: false
+      MultiAZEnabled: false
       Port: 6379
+      TransitEncryptionEnabled: false
       CacheSubnetGroupName: !Ref BrazviaCacheSubnetGroup
-      VpcSecurityGroupIds:
+      SecurityGroupIds:
         - !Ref BrazviaCacheSecurityGroup
       Tags:
         - Key: Name
@@ -666,11 +670,11 @@ Resources:
           S3_PROPERTIES_PREFIX: properties
           VALKEY_HOST: !If
             - CreateManagedDatabase
-            - !GetAtt BrazviaCacheCluster.RedisEndpoint.Address
+            - !GetAtt BrazviaReplicationGroup.PrimaryEndPoint.Address
             - ""
           VALKEY_PORT: !If
             - CreateManagedDatabase
-            - !GetAtt BrazviaCacheCluster.RedisEndpoint.Port
+            - !GetAtt BrazviaReplicationGroup.PrimaryEndPoint.Port
             - "6379"
       Policies:
         - S3CrudPolicy:
@@ -781,7 +785,7 @@ Outputs:
   ValkeyEndpoint:
     Condition: CreateManagedDatabase
     Description: Endpoint do ElastiCache Valkey
-    Value: !GetAtt BrazviaCacheCluster.RedisEndpoint.Address
+    Value: !GetAtt BrazviaReplicationGroup.PrimaryEndPoint.Address
   FckNatAsgName:
     Condition: CreateManagedDatabase
     Description: Auto Scaling Group do fck-nat (NAT instance econômica)
